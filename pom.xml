@@ -8,6 +8,10 @@
 	<name>assets-service</name>
 	<description>Assets service</description>
 
+	<properties>
+		<java.version>21</java.version>
+	</properties>
+
 	<dependencies>
 		<dependency>
 			<groupId>net.dimjasevic.karlo.fer.evidentor</groupId>
@@ -35,7 +39,8 @@
 							<artifactId>lombok</artifactId>
 							<version>1.18.38</version>
 						</path>
-					</annotationProcessorPaths>
+					</annotationProcessorPaths><source>9</source>
+					<target>9</target>
 				</configuration>
 			</plugin>
 			<plugin>

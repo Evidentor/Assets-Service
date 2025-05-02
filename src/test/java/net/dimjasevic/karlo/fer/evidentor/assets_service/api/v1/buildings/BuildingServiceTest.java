@@ -5,6 +5,7 @@ import net.dimjasevic.karlo.fer.evidentor.domain.buildings.Building;
 import net.dimjasevic.karlo.fer.evidentor.domain.buildings.BuildingRepository;
 import net.dimjasevic.karlo.fer.evidentor.domain.floors.Floor;
 import net.dimjasevic.karlo.fer.evidentor.domain.rooms.Room;
+import net.dimjasevic.karlo.fer.evidentor.domain.roomvisualizations.RoomVisualization;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,14 +35,16 @@ class BuildingServiceTest {
 
         Floor floor1 = new Floor(building, 0, false);
         Floor floor2 = new Floor(building, 1, false);
-        building.setFloors(new HashSet<>(List.of(floor1, floor2)));
 
         Room room1 = new Room(floor1, "Room11", false);
         Room room2 = new Room(floor1, "Room12", false);
         Room room3 = new Room(floor1, "Room13", false);
         Room room4 = new Room(floor2, "Room21", false);
-        floor1.setRooms(new HashSet<>(List.of(room1, room2, room3)));
-        floor2.setRooms(new HashSet<>(List.of(room4)));
+
+        new RoomVisualization(room1, (short) 1, (short) 1, (short) 1, (short) 1, false);
+        new RoomVisualization(room2, (short) 2, (short) 2, (short) 2, (short) 2, false);
+        new RoomVisualization(room3, (short) 3, (short) 3, (short) 3, (short) 3, false);
+        new RoomVisualization(room4, (short) 4, (short) 4, (short) 4, (short) 4, false);
 
         buildingRepository.save(building);
 
@@ -72,6 +75,10 @@ class BuildingServiceTest {
         body.getFloors().forEach(floor -> {
             assertThat(floor).isNotNull();
             assertThat(floor.getRooms().size()).isEqualTo(floorRooms.get(floor.getId()).size());
+            floor.getRooms().forEach(room -> {
+                assertThat(room).isNotNull();
+                assertThat(room.getRoomVisualization()).isNotNull();
+            });
         });
     }
 }

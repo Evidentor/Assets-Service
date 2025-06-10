@@ -2,15 +2,19 @@ package net.dimjasevic.karlo.fer.evidentor.assets_service.rest.v1;
 
 import lombok.AllArgsConstructor;
 import net.dimjasevic.karlo.fer.evidentor.assets_service.domain.view.RoomPresence;
+import net.dimjasevic.karlo.fer.evidentor.assets_service.domain.view.UserPresence;
 import net.dimjasevic.karlo.fer.evidentor.assets_service.dto.common.ContentMetaResponse;
 import net.dimjasevic.karlo.fer.evidentor.assets_service.dto.common.EntityNotFoundMetaResponse;
 import net.dimjasevic.karlo.fer.evidentor.assets_service.dto.v1.response.BuildingFloorPresenceResponse;
 import net.dimjasevic.karlo.fer.evidentor.assets_service.dto.v1.response.BuildingResponse;
+import net.dimjasevic.karlo.fer.evidentor.assets_service.dto.v1.response.BuildingUserPresenceResponse;
 import net.dimjasevic.karlo.fer.evidentor.assets_service.dto.v1.response.common.BuildingMetaResponse;
 import net.dimjasevic.karlo.fer.evidentor.assets_service.mapper.v1.BuildingFloorPresenceResponseMapper;
 import net.dimjasevic.karlo.fer.evidentor.assets_service.mapper.v1.BuildingResponseMapper;
+import net.dimjasevic.karlo.fer.evidentor.assets_service.mapper.v1.BuildingUserPresenceResponseMapper;
 import net.dimjasevic.karlo.fer.evidentor.assets_service.service.v1.BuildingService;
 import net.dimjasevic.karlo.fer.evidentor.assets_service.service.v1.view.RoomPresenceService;
+import net.dimjasevic.karlo.fer.evidentor.assets_service.service.v1.view.UserPresenceService;
 import net.dimjasevic.karlo.fer.evidentor.domain.buildings.Building;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -19,6 +23,8 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.List;
 
 @AllArgsConstructor
@@ -28,6 +34,7 @@ public class BuildingController {
 
     private final BuildingService buildingService;
     private final RoomPresenceService roomPresenceService;
+    private final UserPresenceService userPresenceService;
 
     @GetMapping("/{buildingId}/floors/{floorId}")
     public ResponseEntity<ContentMetaResponse<?, ?>> getBuildingFloor(
@@ -88,6 +95,28 @@ public class BuildingController {
             @PathVariable("floorId") Long floorId,
             @PathVariable("userId") Long userId
     ) {
-        return new ResponseEntity<>(HttpStatus.OK);
+        Building building;
+        try {
+            building = buildingService.getBuildingFloor(buildingId, floorId);
+        } catch (RuntimeException e) {
+//            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
+//                    new ContentMetaResponse<>(null, new EntityNotFoundMetaResponse(e.getMessage()))
+//            );
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
+
+        List<UserPresence> userPresences = userPresenceService.findByScanDate(
+                userId, LocalDate.now(ZoneId.of("UTC"))
+        );
+        Integer totalNumberOfFloors = buildingService.getNumberOfFloors(buildingId);
+        ContentMetaResponse<BuildingUserPresenceResponse, BuildingMetaResponse> response;
+        response = BuildingUserPresenceResponseMapper.map(
+                building,
+                building.getFloors().iterator().next(),
+                userPresences,
+                totalNumberOfFloors
+        );
+
+        return ResponseEntity.ok(response);
     }
 }

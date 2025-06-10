@@ -9,7 +9,13 @@ spring:
     driverClassName: org.postgresql.Driver
     username: postgres
     password: postgres
+  grpc:
+    server:
+      port: 9093
+      reflection:
+        enabled: true
   jpa:
     hibernate:
       ddl-auto: none
     show-sql: true
+debug: false

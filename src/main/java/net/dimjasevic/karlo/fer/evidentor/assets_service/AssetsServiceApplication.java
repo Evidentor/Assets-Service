@@ -7,7 +7,12 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 
 @SpringBootApplication
 @EntityScan(basePackages = "net.dimjasevic.karlo.fer.evidentor.domain")
-@EnableJpaRepositories(basePackages = "net.dimjasevic.karlo.fer.evidentor.domain")
+@EnableJpaRepositories(
+		basePackages = {
+				"net.dimjasevic.karlo.fer.evidentor.domain",
+				"net.dimjasevic.karlo.fer.evidentor.assets_service"
+		}
+)
 public class AssetsServiceApplication {
 
 	public static void main(String[] args) {

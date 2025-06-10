@@ -1,4 +1,4 @@
-package net.dimjasevic.karlo.fer.evidentor.assets_service.api.v1.buildings;
+package net.dimjasevic.karlo.fer.evidentor.assets_service.rest.v1;
 
 import jakarta.transaction.Transactional;
 import net.dimjasevic.karlo.fer.evidentor.domain.buildings.Building;

@@ -1,0 +1,34 @@
+package net.dimjasevic.karlo.fer.evidentor.assets_service.dao.v1;
+
+import jakarta.validation.constraints.NotNull;
+import net.dimjasevic.karlo.fer.evidentor.domain.buildings.Building;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
+import org.springframework.stereotype.Repository;
+
+import java.util.Optional;
+
+@Repository(value = "ServiceBuildingRepositoryV1")
+public interface BuildingRepository extends JpaRepository<Building, Long> {
+
+    @Query("SELECT b FROM Building b WHERE b.id = :id")
+    Optional<Building> findByIdWithoutJoins(@NotNull @Param("id") Long id);
+
+    @Query(
+            value = "SELECT b FROM Building b " +
+                    "LEFT JOIN FETCH b.floors f " +
+                    "LEFT JOIN FETCH f.rooms r " +
+                    "LEFT JOIN FETCH RoomVisualization rv ON r.id = rv.roomId " +
+                    "WHERE b.id = :buildingId AND f.id = :floorId"
+    )
+    Optional<Building> findByIdAndFloorIdWithRoomVisualizations(
+            @NotNull @Param("buildingId") Long buildingId,
+            @NotNull @Param("floorId") Long floorId
+    );
+
+    @Query(
+            value = "SELECT COUNT(f.id) FROM Building b LEFT JOIN b.floors f"
+    )
+    Integer getNumberOfFloors(@NotNull @Param("id") Long id);
+}

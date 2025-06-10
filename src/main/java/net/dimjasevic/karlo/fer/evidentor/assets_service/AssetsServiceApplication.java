@@ -3,16 +3,13 @@ package net.dimjasevic.karlo.fer.evidentor.assets_service;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
+import org.springframework.context.annotation.ComponentScan;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 
 @SpringBootApplication
-@EntityScan(basePackages = "net.dimjasevic.karlo.fer.evidentor.domain")
-@EnableJpaRepositories(
-		basePackages = {
-				"net.dimjasevic.karlo.fer.evidentor.domain",
-				"net.dimjasevic.karlo.fer.evidentor.assets_service"
-		}
-)
+@EnableJpaRepositories("net.dimjasevic.karlo.fer.evidentor.*")
+@ComponentScan(basePackages = {"net.dimjasevic.karlo.fer.evidentor.*"})
+@EntityScan("net.dimjasevic.karlo.fer.evidentor.*")
 public class AssetsServiceApplication {
 
 	public static void main(String[] args) {

@@ -37,7 +37,17 @@ public interface BuildingRepository extends JpaRepository<Building, Long> {
     );
 
     @Query(
-            value = "SELECT COUNT(f.id) FROM Building b LEFT JOIN b.floors f"
+            value = "SELECT COUNT(f.id) FROM Building b LEFT JOIN b.floors f WHERE b.id = :id"
     )
     Integer getNumberOfFloors(@NotNull @Param("id") Long id);
+
+    @Query(
+            value = "SELECT f.id FROM Building b LEFT JOIN b.floors f WHERE b.id = :id AND f.index = :index - 1"
+    )
+    Optional<Long> getPreviousFloorId(@NotNull @Param("id") Long buildingId, @NotNull @Param("index") Integer floorIndex);
+
+    @Query(
+            value = "SELECT f.id FROM Building b LEFT JOIN b.floors f WHERE b.id = :id AND f.index = :index + 1"
+    )
+    Optional<Long> getNextFloorId(@NotNull @Param("id") Long buildingId, @NotNull @Param("index") Integer floorIndex);
 }

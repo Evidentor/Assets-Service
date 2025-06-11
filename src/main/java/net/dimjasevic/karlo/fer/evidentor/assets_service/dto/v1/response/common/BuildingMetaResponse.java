@@ -4,6 +4,8 @@ public record BuildingMetaResponse(
         Integer currentFloor,
         Boolean hasNextFloor,
         Boolean hasPreviousFloor,
-        Integer totalNumberOfFloors
+        Integer totalNumberOfFloors,
+        Long previousFloorId,
+        Long nextFloorId
 ) {
 }

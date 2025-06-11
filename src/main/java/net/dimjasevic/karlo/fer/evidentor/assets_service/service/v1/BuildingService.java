@@ -47,4 +47,12 @@ public class BuildingService {
     public Integer getNumberOfFloors(Long buildingId) {
         return repository.getNumberOfFloors(buildingId);
     }
+
+    public Long getPreviousFloorId(Long buildingId, Integer floorIndex) {
+        return repository.getPreviousFloorId(buildingId, floorIndex).orElse(null);
+    }
+
+    public Long getNextFloorId(Long buildingId, Integer floorIndex) {
+        return repository.getNextFloorId(buildingId, floorIndex).orElse(null);
+    }
 }

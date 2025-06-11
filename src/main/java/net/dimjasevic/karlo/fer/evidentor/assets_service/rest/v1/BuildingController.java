@@ -17,6 +17,7 @@ import net.dimjasevic.karlo.fer.evidentor.assets_service.service.v1.BuildingServ
 import net.dimjasevic.karlo.fer.evidentor.assets_service.service.v1.view.RoomPresenceService;
 import net.dimjasevic.karlo.fer.evidentor.assets_service.service.v1.view.UserPresenceService;
 import net.dimjasevic.karlo.fer.evidentor.domain.buildings.Building;
+import net.dimjasevic.karlo.fer.evidentor.domain.floors.Floor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -58,6 +59,7 @@ public class BuildingController {
         PageableMetaResponse meta = new PageableMetaResponse(
                 buildingsPage.hasPrevious(),
                 buildingsPage.hasNext(),
+                buildingsPage.getNumber(),
                 buildingsPage.getTotalElements(),
                 buildingsPage.getTotalPages()
         );
@@ -83,11 +85,14 @@ public class BuildingController {
         }
 
         Integer totalNumberOfFloors = buildingService.getNumberOfFloors(buildingId);
+        Floor floor = building.getFloors().iterator().next();
         ContentMetaResponse<BuildingResponse, BuildingMetaResponse> response;
         response = BuildingResponseMapper.map(
                 building,
-                building.getFloors().iterator().next(),
-                totalNumberOfFloors
+                floor,
+                totalNumberOfFloors,
+                buildingService.getPreviousFloorId(buildingId, floor.getIndex()),
+                buildingService.getNextFloorId(buildingId, floor.getIndex())
         );
 
         return ResponseEntity.ok(response);
@@ -110,12 +115,15 @@ public class BuildingController {
 
         List<RoomPresence> roomsPresence = roomPresenceService.findAll();
         Integer totalNumberOfFloors = buildingService.getNumberOfFloors(buildingId);
+        Floor floor = building.getFloors().iterator().next();
         ContentMetaResponse<BuildingFloorPresenceResponse, BuildingMetaResponse> response;
         response = BuildingFloorPresenceResponseMapper.map(
                 building,
-                building.getFloors().iterator().next(),
+                floor,
                 roomsPresence,
-                totalNumberOfFloors
+                totalNumberOfFloors,
+                buildingService.getPreviousFloorId(buildingId, floor.getIndex()),
+                buildingService.getNextFloorId(buildingId, floor.getIndex())
         );
 
         return ResponseEntity.ok(response);
@@ -141,12 +149,15 @@ public class BuildingController {
                 userId, LocalDate.now(ZoneId.of("UTC"))
         );
         Integer totalNumberOfFloors = buildingService.getNumberOfFloors(buildingId);
+        Floor floor = building.getFloors().iterator().next();
         ContentMetaResponse<BuildingUserPresenceResponse, BuildingMetaResponse> response;
         response = BuildingUserPresenceResponseMapper.map(
                 building,
-                building.getFloors().iterator().next(),
+                floor,
                 userPresences,
-                totalNumberOfFloors
+                totalNumberOfFloors,
+                buildingService.getPreviousFloorId(buildingId, floor.getIndex()),
+                buildingService.getNextFloorId(buildingId, floor.getIndex())
         );
 
         return ResponseEntity.ok(response);

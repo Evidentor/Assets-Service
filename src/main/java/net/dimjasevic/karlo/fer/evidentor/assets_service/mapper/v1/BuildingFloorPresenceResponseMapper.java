@@ -19,7 +19,9 @@ public class BuildingFloorPresenceResponseMapper {
             Building building,
             Floor floor,
             List<RoomPresence> roomsPresence,
-            Integer totalNumberOfFloors
+            Integer totalNumberOfFloors,
+            Long previousFloorId,
+            Long nextFloorId
     ) {
         Map<Long, RoomPresence> roomsPresenceMap = roomsPresence
                 .stream()
@@ -59,7 +61,9 @@ public class BuildingFloorPresenceResponseMapper {
                 floor.getIndex(),
                 floor.getIndex() < totalNumberOfFloors - 1,
                 floor.getIndex() > 0,
-                totalNumberOfFloors
+                totalNumberOfFloors,
+                previousFloorId,
+                nextFloorId
         );
 
         return new ContentMetaResponse<>(content, meta);

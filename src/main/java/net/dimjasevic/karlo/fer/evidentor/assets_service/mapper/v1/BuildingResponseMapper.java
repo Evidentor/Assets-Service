@@ -13,7 +13,9 @@ public class BuildingResponseMapper {
     public static ContentMetaResponse<BuildingResponse, BuildingMetaResponse> map(
             Building building,
             Floor floor,
-            Integer totalNumberOfFloors
+            Integer totalNumberOfFloors,
+            Long previousFloorId,
+            Long nextFloorId
     ) {
         BuildingResponse content = new BuildingResponse(
                 building.getId(),
@@ -40,7 +42,9 @@ public class BuildingResponseMapper {
                 floor.getIndex(),
                 floor.getIndex() < totalNumberOfFloors - 1,
                 floor.getIndex() > 0,
-                totalNumberOfFloors
+                totalNumberOfFloors,
+                previousFloorId,
+                nextFloorId
         );
 
         return new ContentMetaResponse<>(content, meta);

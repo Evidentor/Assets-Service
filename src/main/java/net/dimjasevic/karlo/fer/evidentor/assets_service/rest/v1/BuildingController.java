@@ -4,8 +4,9 @@ import lombok.AllArgsConstructor;
 import net.dimjasevic.karlo.fer.evidentor.assets_service.domain.view.RoomPresence;
 import net.dimjasevic.karlo.fer.evidentor.assets_service.domain.view.UserPresence;
 import net.dimjasevic.karlo.fer.evidentor.assets_service.dto.common.ContentMetaResponse;
-import net.dimjasevic.karlo.fer.evidentor.assets_service.dto.common.EntityNotFoundMetaResponse;
+import net.dimjasevic.karlo.fer.evidentor.assets_service.dto.common.PageableMetaResponse;
 import net.dimjasevic.karlo.fer.evidentor.assets_service.dto.v1.response.BuildingFloorPresenceResponse;
+import net.dimjasevic.karlo.fer.evidentor.assets_service.dto.v1.response.BuildingInfoResponse;
 import net.dimjasevic.karlo.fer.evidentor.assets_service.dto.v1.response.BuildingResponse;
 import net.dimjasevic.karlo.fer.evidentor.assets_service.dto.v1.response.BuildingUserPresenceResponse;
 import net.dimjasevic.karlo.fer.evidentor.assets_service.dto.v1.response.common.BuildingMetaResponse;
@@ -16,18 +17,19 @@ import net.dimjasevic.karlo.fer.evidentor.assets_service.service.v1.BuildingServ
 import net.dimjasevic.karlo.fer.evidentor.assets_service.service.v1.view.RoomPresenceService;
 import net.dimjasevic.karlo.fer.evidentor.assets_service.service.v1.view.UserPresenceService;
 import net.dimjasevic.karlo.fer.evidentor.domain.buildings.Building;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
 import java.time.ZoneId;
+import java.util.ArrayList;
 import java.util.List;
 
 @AllArgsConstructor
+@CrossOrigin(origins = "http://localhost:5173")
 @RestController
 @RequestMapping("/v1/buildings")
 public class BuildingController {
@@ -36,8 +38,37 @@ public class BuildingController {
     private final RoomPresenceService roomPresenceService;
     private final UserPresenceService userPresenceService;
 
+    @GetMapping
+    public ResponseEntity<ContentMetaResponse<List<BuildingInfoResponse>, PageableMetaResponse>> findAll(Pageable pageable) {
+        Page<Building> buildingsPage = buildingService.findAllOnlyAlive(pageable);
+
+        List<BuildingInfoResponse> content = new ArrayList<>();
+        // TODO: Move this to one single query
+        for (Building building : buildingsPage) {
+            Integer numberOfFloors = buildingService.getNumberOfFloors(building.getId());
+            content.add(new BuildingInfoResponse(
+                    building.getId(),
+                    building.getName(),
+                    building.getImage(),
+                    numberOfFloors
+            ));
+        }
+
+        // TODO: Mapper
+        PageableMetaResponse meta = new PageableMetaResponse(
+                buildingsPage.hasPrevious(),
+                buildingsPage.hasNext(),
+                buildingsPage.getTotalElements(),
+                buildingsPage.getTotalPages()
+        );
+        ContentMetaResponse<List<BuildingInfoResponse>, PageableMetaResponse> response = new ContentMetaResponse<>(
+                content, meta
+        );
+        return ResponseEntity.ok(response);
+    }
+
     @GetMapping("/{buildingId}/floors/{floorId}")
-    public ResponseEntity<ContentMetaResponse<?, ?>> getBuildingFloor(
+    public ResponseEntity<ContentMetaResponse<BuildingResponse, BuildingMetaResponse>> getBuildingFloor(
             @PathVariable("buildingId") Long buildingId,
             @PathVariable("floorId") Long floorId
     ) {
@@ -45,9 +76,10 @@ public class BuildingController {
         try {
             building = buildingService.getBuildingFloor(buildingId, floorId);
         } catch (RuntimeException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
-                    new ContentMetaResponse<>(null, new EntityNotFoundMetaResponse(e.getMessage()))
-            );
+//            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
+//                    new ContentMetaResponse<>(null, new EntityNotFoundMetaResponse(e.getMessage()))
+//            );
+            return ResponseEntity.notFound().build();
         }
 
         Integer totalNumberOfFloors = buildingService.getNumberOfFloors(buildingId);

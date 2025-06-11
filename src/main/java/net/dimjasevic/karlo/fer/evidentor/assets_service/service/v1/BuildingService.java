@@ -3,6 +3,8 @@ package net.dimjasevic.karlo.fer.evidentor.assets_service.service.v1;
 import lombok.AllArgsConstructor;
 import net.dimjasevic.karlo.fer.evidentor.assets_service.dao.v1.BuildingRepository;
 import net.dimjasevic.karlo.fer.evidentor.domain.buildings.Building;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 @AllArgsConstructor
@@ -15,6 +17,10 @@ public class BuildingService {
         return repository.findById(buildingId).orElseThrow(() -> new RuntimeException(
                 String.format("Building with id [%d] not found", buildingId)
         ));
+    }
+
+    public Page<Building> findAllOnlyAlive(Pageable pageable) {
+        return repository.findAllOnlyAlive(pageable);
     }
 
     public Building getBuildingFloor(Long buildingId, Long floorId) {

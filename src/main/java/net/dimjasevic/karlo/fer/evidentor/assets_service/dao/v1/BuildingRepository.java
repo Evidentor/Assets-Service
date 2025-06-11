@@ -2,6 +2,8 @@ package net.dimjasevic.karlo.fer.evidentor.assets_service.dao.v1;
 
 import jakarta.validation.constraints.NotNull;
 import net.dimjasevic.karlo.fer.evidentor.domain.buildings.Building;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -14,6 +16,13 @@ public interface BuildingRepository extends JpaRepository<Building, Long> {
 
     @Query("SELECT b FROM Building b WHERE b.id = :id")
     Optional<Building> findByIdWithoutJoins(@NotNull @Param("id") Long id);
+
+    @Query(
+            value = "SELECT b.* FROM buildings b WHERE b.deleted IS FALSE",
+            countQuery = "SELECT COUNT(*) FROM buildings b WHERE b.deleted IS FALSE",
+            nativeQuery = true
+    )
+    Page<Building> findAllOnlyAlive(Pageable pageable);
 
     @Query(
             value = "SELECT b FROM Building b " +

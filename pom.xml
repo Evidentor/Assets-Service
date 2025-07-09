@@ -54,8 +54,9 @@
 							<artifactId>lombok</artifactId>
 							<version>1.18.38</version>
 						</path>
-					</annotationProcessorPaths><source>21</source>
-					<target>21</target>
+					</annotationProcessorPaths>
+					<source>${java.version}</source>
+					<target>${java.version}</target>
 					<compilerArgs>--enable-preview</compilerArgs>
 				</configuration>
 			</plugin>
@@ -71,6 +72,9 @@
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
+				<configuration>
+					<jvmArguments>--enable-preview</jvmArguments>
+				</configuration>
 				<executions>
 					<execution>
 						<goals>

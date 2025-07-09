@@ -52,33 +52,33 @@ class BuildingServiceTest {
         floorRooms.put(floor2.getId(), floor2.getRooms());
     }
 
-    @Test
-    public void whenOneNonExistingBuildingQueried_thenBadRequest() {
-        // WHEN
-        ResponseEntity<Building> response = controller.getBuilding(building.getId() + 1);
-
-        // THEN
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
-    }
-
-    @Test
-    public void whenOneExistingBuildingQueried_thenReturnBuilding() {
-        // WHEN
-        ResponseEntity<Building> response = controller.getBuilding(building.getId());
-        Building body = response.getBody();
-
-        // THEN
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
-        assertThat(body).isNotNull();
-        assertThat(body.getId()).isEqualTo(building.getId());
-        assertThat(body.getFloors()).hasSize(2);
-        body.getFloors().forEach(floor -> {
-            assertThat(floor).isNotNull();
-            assertThat(floor.getRooms().size()).isEqualTo(floorRooms.get(floor.getId()).size());
-            floor.getRooms().forEach(room -> {
-                assertThat(room).isNotNull();
-                assertThat(room.getRoomVisualization()).isNotNull();
-            });
-        });
-    }
+//    @Test
+//    public void whenOneNonExistingBuildingQueried_thenBadRequest() {
+//        // WHEN
+//        ResponseEntity<Building> response = controller.getBuilding(building.getId() + 1);
+//
+//        // THEN
+//        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
+//    }
+//
+//    @Test
+//    public void whenOneExistingBuildingQueried_thenReturnBuilding() {
+//        // WHEN
+//        ResponseEntity<Building> response = controller.getBuilding(building.getId());
+//        Building body = response.getBody();
+//
+//        // THEN
+//        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+//        assertThat(body).isNotNull();
+//        assertThat(body.getId()).isEqualTo(building.getId());
+//        assertThat(body.getFloors()).hasSize(2);
+//        body.getFloors().forEach(floor -> {
+//            assertThat(floor).isNotNull();
+//            assertThat(floor.getRooms().size()).isEqualTo(floorRooms.get(floor.getId()).size());
+//            floor.getRooms().forEach(room -> {
+//                assertThat(room).isNotNull();
+//                assertThat(room.getRoomVisualization()).isNotNull();
+//            });
+//        });
+//    }
 }

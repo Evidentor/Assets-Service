@@ -58,6 +58,24 @@ public class DeviceController {
         return ResponseEntity.ok(response);
     }
 
+    @GetMapping("/{deviceId}")
+    public ResponseEntity<DeviceInfoResponse> findById(@PathVariable("deviceId") long deviceId) {
+        Device device;
+        try {
+            device = deviceService.getById(deviceId);
+        } catch (RuntimeException e) {
+            return ResponseEntity.notFound().build();
+        }
+
+        return ResponseEntity.ok(new DeviceInfoResponse(
+                device.getId(),
+                device.getRoom() == null ? null : device.getRoom().getId(),
+                device.getInstallationDate(),
+                device.getSerialNumber(),
+                null
+        ));
+    }
+
     @PostMapping
     public ResponseEntity<ContentMetaResponse<DeviceInfoResponse, Object>> create(
             @RequestBody DeviceBodyRequest request

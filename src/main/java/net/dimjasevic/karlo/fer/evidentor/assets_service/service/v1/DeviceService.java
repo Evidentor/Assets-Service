@@ -24,6 +24,10 @@ public class DeviceService {
         return repository.findAllOnlyAlive(pageable);
     }
 
+    public Device getById(Long id) {
+        return repository.findById(id).orElseThrow();
+    }
+
     public Telemetry findLatestTelemetry(Long deviceId) {
         return repository.findLatestTelemetry(deviceId).orElse(null);
     }

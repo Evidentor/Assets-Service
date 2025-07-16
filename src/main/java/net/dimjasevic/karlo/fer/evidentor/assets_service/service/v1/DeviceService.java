@@ -58,7 +58,7 @@ public class DeviceService {
             throw new IllegalArgumentException("Device does not exist");
         }
 
-        if (serialNumber != null && !serialNumber.isEmpty()) {
+        if (serialNumber != null && !serialNumber.isEmpty() && !serialNumber.equals(device.getSerialNumber())) {
             if (repository.existsBySerialNumber(serialNumber)) {
                 throw new IllegalArgumentException("Device with serial number already exists");
             }

@@ -28,4 +28,6 @@ public interface DeviceRepository extends JpaRepository<Device, Long> {
             nativeQuery = true
     )
     Optional<Telemetry> findLatestTelemetry(@NotNull @Param("id") Long deviceId);
+
+    boolean existsBySerialNumber(String serialNumber);
 }

@@ -3,6 +3,7 @@ package net.dimjasevic.karlo.fer.evidentor.assets_service.rest.v1;
 import lombok.AllArgsConstructor;
 import net.dimjasevic.karlo.fer.evidentor.assets_service.dto.common.ContentMetaResponse;
 import net.dimjasevic.karlo.fer.evidentor.assets_service.dto.common.PageableMetaResponse;
+import net.dimjasevic.karlo.fer.evidentor.assets_service.dto.v1.request.DeviceBodyRequest;
 import net.dimjasevic.karlo.fer.evidentor.assets_service.dto.v1.response.DeviceInfoResponse;
 import net.dimjasevic.karlo.fer.evidentor.assets_service.service.v1.DeviceService;
 import net.dimjasevic.karlo.fer.evidentor.domain.devices.Device;
@@ -12,6 +13,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.net.URI;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -52,6 +54,55 @@ public class DeviceController {
         );
         ContentMetaResponse<List<DeviceInfoResponse>, PageableMetaResponse> response = new ContentMetaResponse<>(
                 content, meta
+        );
+        return ResponseEntity.ok(response);
+    }
+
+    @PostMapping
+    public ResponseEntity<ContentMetaResponse<DeviceInfoResponse, Object>> create(
+            @RequestBody DeviceBodyRequest request
+    ) {
+        Device device;
+        try {
+            device = deviceService.create(request.serialNumber(), request.roomId(), request.installationDate());
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().build();
+        }
+
+        ContentMetaResponse<DeviceInfoResponse, Object> response = new ContentMetaResponse<>(
+                new DeviceInfoResponse(
+                        device.getId(),
+                        device.getRoom() == null ? null : device.getRoom().getId(),
+                        device.getInstallationDate(),
+                        device.getSerialNumber(),
+                        null
+                ), null
+        );
+        return ResponseEntity
+                .created(URI.create(String.format("/api/v1/devices/%d", device.getId())))
+                .body(response);
+    }
+
+    @PutMapping("/{deviceId}")
+    public ResponseEntity<ContentMetaResponse<DeviceInfoResponse, Object>> update(
+            @PathVariable("deviceId") Long deviceId,
+            @RequestBody DeviceBodyRequest request
+    ) {
+        Device device;
+        try {
+            device = deviceService.update(deviceId, request.serialNumber(), request.roomId(), request.installationDate());
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().build();
+        }
+
+        ContentMetaResponse<DeviceInfoResponse, Object> response = new ContentMetaResponse<>(
+                new DeviceInfoResponse(
+                        device.getId(),
+                        device.getRoom() == null ? null : device.getRoom().getId(),
+                        device.getInstallationDate(),
+                        device.getSerialNumber(),
+                        null
+                ), null
         );
         return ResponseEntity.ok(response);
     }

@@ -6,6 +6,7 @@ public record DeviceInfoResponse(
         Long id,
         Long roomId,
         LocalDateTime installationDate,
-        String serialNumber
+        String serialNumber,
+        LocalDateTime lastMessageTimestamp
 ) {
 }

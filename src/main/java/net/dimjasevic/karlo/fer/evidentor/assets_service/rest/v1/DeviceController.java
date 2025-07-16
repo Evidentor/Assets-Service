@@ -6,6 +6,7 @@ import net.dimjasevic.karlo.fer.evidentor.assets_service.dto.common.PageableMeta
 import net.dimjasevic.karlo.fer.evidentor.assets_service.dto.v1.response.DeviceInfoResponse;
 import net.dimjasevic.karlo.fer.evidentor.assets_service.service.v1.DeviceService;
 import net.dimjasevic.karlo.fer.evidentor.domain.devices.Device;
+import net.dimjasevic.karlo.fer.evidentor.domain.telemetry.Telemetry;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
@@ -14,6 +15,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -31,13 +33,17 @@ public class DeviceController {
 
         List<DeviceInfoResponse> content = devicesPage.getContent()
                 .stream()
-                .map(device ->
-                        new DeviceInfoResponse(
-                                device.getId(),
-                                device.getRoom() == null ? null : device.getRoom().getId(),
-                                device.getInstallationDate(),
-                                device.getSerialNumber())
-                )
+                .map(device -> {
+                    Telemetry latestTelemetry = deviceService.findLatestTelemetry(device.getId());
+                    LocalDateTime lastMessageTimestamp = latestTelemetry == null ? null : latestTelemetry.getScanTime();
+                    return new DeviceInfoResponse(
+                            device.getId(),
+                            device.getRoom() == null ? null : device.getRoom().getId(),
+                            device.getInstallationDate(),
+                            device.getSerialNumber(),
+                            lastMessageTimestamp
+                    );
+                })
                 .collect(Collectors.toList());
 
         // TODO: Mapper

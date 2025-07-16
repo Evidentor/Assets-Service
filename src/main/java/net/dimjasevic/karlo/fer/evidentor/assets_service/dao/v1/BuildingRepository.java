@@ -2,6 +2,7 @@ package net.dimjasevic.karlo.fer.evidentor.assets_service.dao.v1;
 
 import jakarta.validation.constraints.NotNull;
 import net.dimjasevic.karlo.fer.evidentor.domain.buildings.Building;
+import net.dimjasevic.karlo.fer.evidentor.domain.telemetry.Telemetry;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -9,6 +10,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Optional;
 
 @Repository(value = "ServiceBuildingRepositoryV1")
@@ -50,4 +52,20 @@ public interface BuildingRepository extends JpaRepository<Building, Long> {
             value = "SELECT f.id FROM Building b LEFT JOIN b.floors f WHERE b.id = :id AND f.index = :index + 1"
     )
     Optional<Long> getNextFloorId(@NotNull @Param("id") Long buildingId, @NotNull @Param("index") Integer floorIndex);
+
+    // TODO: Move this somewhere else (it is telemetry)
+    @Query(
+            value = "SELECT t FROM Telemetry t " +
+                    "JOIN FETCH t.room r " +
+                    "JOIN FETCH r.floor f " +
+                    "JOIN FETCH f.building b " +
+                    "WHERE b.id = :id AND f.id = :floorId " +
+                    "ORDER BY t.id.scanTime DESC " +
+                    "LIMIT :limit"
+    )
+    List<Telemetry> findMostRecentTelemetries(
+            @NotNull @Param("id") Long buildingId,
+            @NotNull @Param("floorId") Long floorId,
+            @NotNull @Param("limit") Integer limit
+    );
 }

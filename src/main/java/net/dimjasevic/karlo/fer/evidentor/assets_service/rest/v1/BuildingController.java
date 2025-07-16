@@ -5,10 +5,7 @@ import net.dimjasevic.karlo.fer.evidentor.assets_service.domain.view.RoomPresenc
 import net.dimjasevic.karlo.fer.evidentor.assets_service.domain.view.UserPresence;
 import net.dimjasevic.karlo.fer.evidentor.assets_service.dto.common.ContentMetaResponse;
 import net.dimjasevic.karlo.fer.evidentor.assets_service.dto.common.PageableMetaResponse;
-import net.dimjasevic.karlo.fer.evidentor.assets_service.dto.v1.response.BuildingFloorPresenceResponse;
-import net.dimjasevic.karlo.fer.evidentor.assets_service.dto.v1.response.BuildingInfoResponse;
-import net.dimjasevic.karlo.fer.evidentor.assets_service.dto.v1.response.BuildingResponse;
-import net.dimjasevic.karlo.fer.evidentor.assets_service.dto.v1.response.BuildingUserPresenceResponse;
+import net.dimjasevic.karlo.fer.evidentor.assets_service.dto.v1.response.*;
 import net.dimjasevic.karlo.fer.evidentor.assets_service.dto.v1.response.common.BuildingMetaResponse;
 import net.dimjasevic.karlo.fer.evidentor.assets_service.mapper.v1.BuildingFloorPresenceResponseMapper;
 import net.dimjasevic.karlo.fer.evidentor.assets_service.mapper.v1.BuildingResponseMapper;
@@ -18,6 +15,7 @@ import net.dimjasevic.karlo.fer.evidentor.assets_service.service.v1.view.RoomPre
 import net.dimjasevic.karlo.fer.evidentor.assets_service.service.v1.view.UserPresenceService;
 import net.dimjasevic.karlo.fer.evidentor.domain.buildings.Building;
 import net.dimjasevic.karlo.fer.evidentor.domain.floors.Floor;
+import net.dimjasevic.karlo.fer.evidentor.domain.telemetry.Telemetry;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -160,6 +158,32 @@ public class BuildingController {
                 buildingService.getNextFloorId(buildingId, floor.getIndex())
         );
 
+        return ResponseEntity.ok(response);
+    }
+
+    // TODO: Move this somewhere else (it is telemetry)
+    @GetMapping("/{buildingId}/floors/{floorId}/telemetries")
+    public ResponseEntity<ContentMetaResponse<List<TelemetryResponse>, Object>> getBuildingFloorTelemetries(
+            @PathVariable("buildingId") Long buildingId,
+            @PathVariable("floorId") Long floorId,
+            @RequestParam(name = "limit", required = false, defaultValue = "10") Integer limit
+    ) {
+        List<Telemetry> telemetries;
+        try {
+            telemetries = buildingService.findMostRecentTelemetries(buildingId, floorId, limit);
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
+
+        // Format response
+        List<TelemetryResponse> telemetryResponses = telemetries.stream().map(
+                telemetry -> new TelemetryResponse(
+                        String.format("%s %s", telemetry.getUser().getFirstName(), telemetry.getUser().getLastName()),
+                        telemetry.getRoom().getName(),
+                        telemetry.getScanTime()
+                )
+        ).toList();
+        ContentMetaResponse<List<TelemetryResponse>, Object> response = new ContentMetaResponse<>(telemetryResponses, null);
         return ResponseEntity.ok(response);
     }
 }

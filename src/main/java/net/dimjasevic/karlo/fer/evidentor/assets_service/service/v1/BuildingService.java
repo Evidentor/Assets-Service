@@ -3,9 +3,12 @@ package net.dimjasevic.karlo.fer.evidentor.assets_service.service.v1;
 import lombok.AllArgsConstructor;
 import net.dimjasevic.karlo.fer.evidentor.assets_service.dao.v1.BuildingRepository;
 import net.dimjasevic.karlo.fer.evidentor.domain.buildings.Building;
+import net.dimjasevic.karlo.fer.evidentor.domain.telemetry.Telemetry;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 @AllArgsConstructor
 @Service
@@ -54,5 +57,10 @@ public class BuildingService {
 
     public Long getNextFloorId(Long buildingId, Integer floorIndex) {
         return repository.getNextFloorId(buildingId, floorIndex).orElse(null);
+    }
+
+    // TODO: Move this somewhere else (it is telemetry)
+    public List<Telemetry> findMostRecentTelemetries(Long buildingId, Long floorId, Integer limit) {
+        return repository.findMostRecentTelemetries(buildingId, floorId, limit);
     }
 }

@@ -22,4 +22,12 @@ public class DeviceService {
         return repository.findLatestTelemetry(deviceId).orElse(null);
     }
 
+    public boolean deleteDevice(Long deviceId) {
+        Device device = repository.findById(deviceId).orElse(null);
+        if (device != null) {
+            device.setDeleted(true);
+            repository.save(device);
+        }
+        return device != null;
+    }
 }

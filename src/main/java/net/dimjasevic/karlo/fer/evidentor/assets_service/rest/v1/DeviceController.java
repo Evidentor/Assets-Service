@@ -10,17 +10,13 @@ import net.dimjasevic.karlo.fer.evidentor.domain.telemetry.Telemetry;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
 @AllArgsConstructor
-@CrossOrigin(origins = "http://localhost:5173")
 @RestController
 @RequestMapping("/v1/devices")
 public class DeviceController {
@@ -58,5 +54,11 @@ public class DeviceController {
                 content, meta
         );
         return ResponseEntity.ok(response);
+    }
+
+    @DeleteMapping("/{deviceId}")
+    public ResponseEntity<?> deleteDevice(@PathVariable("deviceId") Long deviceId) {
+        boolean deleted = deviceService.deleteDevice(deviceId);
+        return deleted ? ResponseEntity.noContent().build() : ResponseEntity.notFound().build();
     }
 }

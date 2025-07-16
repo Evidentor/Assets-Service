@@ -28,7 +28,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 @AllArgsConstructor
-@CrossOrigin(origins = "http://localhost:5173")
 @RestController
 @RequestMapping("/v1/buildings")
 public class BuildingController {
